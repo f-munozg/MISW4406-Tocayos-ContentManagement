@@ -1,10 +1,10 @@
-"""Handler para el comando CrearContenido
+"""Handler para el comando BuscarContenido
 
 En este archivo se define el handler para crear contenido
 
 """
 
-from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CrearContenido
+from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import BuscarContenido
 from content_management.modulos.content_management.infraestructura.modelos import ContenidoDBModel
 from content_management.seedwork.aplicacion.comandos import ejecutar_commando
 from content_management.infraestructura.pulsar import pulsar_publisher
@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @ejecutar_commando.register
-def _(comando: CrearContenido):
+def _(comando: BuscarContenido):
     """Handler para crear nuevo contenido"""
     try:
         # Crear modelo de base de datos directamente

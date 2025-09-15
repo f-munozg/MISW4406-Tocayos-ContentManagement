@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   content-management:
@@ -16,8 +16,6 @@ services:
       - pulsar-init
     volumes:
       - ./src:/app/src
-    networks:
-      - content-management-network
 
   postgres:
     image: postgres:15
@@ -30,31 +28,30 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - content-management-network
 
   pulsar:
-    image: apachepulsar/pulsar:3.1.0
-    command: bin/pulsar standalone --no-functions-worker --no-stream-storage
+    image: apachepulsar/pulsar:4.1.0
+    command: ["bin/pulsar", "standalone"]
+    restart: unless-stopped
     ports:
-      - "6651:6650"
-      - "8081:8080"
-    environment:
-      - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g
-    volumes:
-      - pulsar_data:/pulsar/data
-    networks:
-      - content-management-network
+      - "6650:6650"
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/admin/v2/brokers/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
 
   pulsar-init:
-    image: apachepulsar/pulsar:3.1.0
+    image: apachepulsar/pulsar:4.1.0
     depends_on:
-      - pulsar
+      pulsar:
+        condition: service_healthy
+    environment:
+      PULSAR_ADMIN_URL: http://pulsar:8080
     volumes:
-      - ./scripts/init-pulsar.sh:/init-pulsar.sh
+      - ./scripts/init-pulsar.sh:/init-pulsar.sh:ro
     command: ["sh", "/init-pulsar.sh"]
-    networks:
-      - content-management-network
 
   pulsar-manager:
     image: apachepulsar/pulsar-manager:v0.4.0
@@ -66,13 +63,7 @@ services:
     command: ["sh", "-c", "bin/pulsar-manager"]
     depends_on:
       - pulsar
-    networks:
-      - content-management-network
 
 volumes:
   postgres_data:
   pulsar_data:
-
-networks:
-  content-management-network:
-    driver: bridge

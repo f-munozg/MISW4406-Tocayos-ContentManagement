@@ -6,7 +6,6 @@ En este archivo se definen los comandos para la gestión de contenido
 
 from dataclasses import dataclass
 from content_management.seedwork.aplicacion.comandos import Comando
-from content_management.modulos.content_management.dominio.entidades import TipoContenido, EstadoContenido, CategoriaContenido
 from datetime import datetime
 import uuid
 

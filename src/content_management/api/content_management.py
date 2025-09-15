@@ -6,8 +6,7 @@ En este archivo se define la API REST para la gestión de contenido
 
 from flask import Blueprint, request, jsonify, Response
 from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import (
-    CrearContenido, EnviarRevisionContenido, AprobarContenido, RechazarContenido,
-    PublicarContenido, ArchivarContenido, ActualizarMetricasContenido
+    BuscarContenido
 )
 from content_management.modulos.content_management.aplicacion.queries.queries_contenido import (
     ObtenerContenido, ObtenerContenidosPorCampana, ObtenerContenidosPorCreador,
@@ -38,9 +37,9 @@ def buscar_contenido():
         map_contenido = MapeadorContenidoDTOJson()
         contenido_dto = map_contenido.externo_a_dto(event_body)
 
-        # Build CrearContenido command with only the required fields
-        from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CrearContenido
-        comando = CrearContenido(
+        # Build BuscarContenido command with only the required fields
+        from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import BuscarContenido
+        comando = BuscarContenido(
             id=contenido_dto.id,
             creador=contenido_dto.creador,
             audiencia=contenido_dto.audiencia,

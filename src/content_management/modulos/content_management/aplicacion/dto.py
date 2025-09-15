@@ -16,6 +16,6 @@ class ContenidoDTO:
     campania: str = ""
     canales: str = ""
     marca: str = ""
-    categoria: str = 
+    categoria: str = ""
     fecha_creacion: str = ""
     fecha_actualizacion: str = ""

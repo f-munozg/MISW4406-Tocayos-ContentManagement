@@ -31,7 +31,6 @@ class MapeadorContenidoDTOJson:
             'campania': dto.campania,
             'canales': dto.canales,
             'marca': dto.marca,
-            'tipo_contenido': dto.tipo_contenido,
             'categoria': dto.categoria,
             'fecha_creacion': dto.fecha_creacion,
             'fecha_actualizacion': dto.fecha_actualizacion

@@ -22,6 +22,9 @@ class PulsarConfig:
         
     def get_topic_name(self, event_type: str) -> str:
         """Genera el nombre del topic basado en el tipo de evento"""
+        if event_type.startswith('partner'):
+            return f"persistent://partner-lifecycle/{self.namespace}/{event_type}"
+
         return f"persistent://{self.tenant}/{self.namespace}/{event_type}"
 
 class PulsarEventPublisher:

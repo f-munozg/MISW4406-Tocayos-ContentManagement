@@ -18,8 +18,11 @@ COPY src/ ./src/
 # Crear directorio para logs
 RUN mkdir -p /app/logs
 
+# Agregar src al PYTHONPATH
+ENV PYTHONPATH=/app/src
+
 # Exponer puerto
 EXPOSE 5001
 
 # Comando por defecto
-CMD ["python", "src/content_management/main.py"]
+CMD ["python", "-m", "content_management.main"]

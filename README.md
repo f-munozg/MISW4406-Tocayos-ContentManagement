@@ -1,18 +1,10 @@
 # Content Management Microservice
 
-Este microservicio se encarga de la gestión de contenido de marketing, incluyendo su creación, revisión, aprobación, publicación y archivado.
+Este microservicio se encarga de la gestión de contenido de marketing siguiendo una arquitectura orientada a eventos.
 
 ## Características
 
-- **Gestión de Contenido**: Crear, enviar a revisión, aprobar, rechazar, publicar y archivar contenido
-- **Tipos de Contenido**: Post Instagram, Story Instagram, Post Facebook, Video YouTube, Post TikTok, Blog Post, Email Marketing, Infografía
-- **Categorías**: Producto, Lifestyle, Educacional, Promocional, Testimonial, Entertainment
-- **Estados**: Borrador, En Revisión, Aprobado, Publicado, Archivado, Rechazado
-- **Métricas**: Seguimiento de engagement, alcance, impresiones y clics
-- **Eventos**: Arquitectura orientada a eventos con Pulsar
-- **Base de Datos**: PostgreSQL con SQLAlchemy
-
-## Arquitectura
+### Arquitectura
 
 El microservicio sigue los principios de Domain-Driven Design (DDD) con:
 
@@ -21,7 +13,7 @@ El microservicio sigue los principios de Domain-Driven Design (DDD) con:
 - **Infraestructura**: Modelos de base de datos, Pulsar, configuración
 - **API**: Endpoints REST para operaciones CRUD
 
-## Tecnologías
+### Tecnologías
 
 - **Backend**: Python 3.11, Flask
 - **Base de Datos**: PostgreSQL 15
@@ -61,60 +53,40 @@ python src/content_management/main.py
 
 ## API Endpoints
 
-### Contenido
+### `GET /content-management/content`
 
-- `POST /content-management/content` - Crear contenido
-- `PUT /content-management/content/{id}/enviar-revision` - Enviar a revisión
-- `PUT /content-management/content/{id}/aprobar` - Aprobar contenido
-- `PUT /content-management/content/{id}/rechazar` - Rechazar contenido
-- `PUT /content-management/content/{id}/publicar` - Publicar contenido
-- `PUT /content-management/content/{id}/archivar` - Archivar contenido
-- `PUT /content-management/content/{id}/actualizar-metricas` - Actualizar métricas
-- `GET /content-management/content/{id}` - Obtener contenido
-- `GET /content-management/contents/campana/{id_campana}` - Obtener contenidos por campaña
-- `GET /content-management/contents/creador/{id_creador}` - Obtener contenidos por creador
-- `GET /content-management/contents/marca/{id_marca}` - Obtener contenidos por marca
-- `GET /content-management/contents/tipo/{tipo}` - Obtener contenidos por tipo
-- `GET /content-management/contents/estado/{estado}` - Obtener contenidos por estado
+Permite buscar el contenido asociado a una campaña.
+
+#### Body
+
+```json
+{
+    "audiencia": "string",
+    "campania": "string",
+    "canales": "string",
+    "marca": "string",
+    "categoria": "string"
+}
+```
+
+#### Evento creado
+```json
+{
+    "identificacion": "string",
+    "campania_asociada": "string",
+    "canales": "string",
+    "marca": "string",
+    "categoria": "string"
+}
+```
 
 ## Eventos
 
 El microservicio publica los siguientes eventos en Pulsar:
 
-- `ContenidoCreado` - Cuando se crea nuevo contenido
-- `ContenidoEnviadoRevision` - Cuando se envía contenido a revisión
-- `ContenidoAprobado` - Cuando se aprueba contenido
-- `ContenidoRechazado` - Cuando se rechaza contenido
-- `ContenidoPublicado` - Cuando se publica contenido
-- `ContenidoArchivado` - Cuando se archiva contenido
-- `MetricasContenidoActualizadas` - Cuando se actualizan las métricas
+- `ContenidoAsociadoPartner` - Cuando se buscar asociar contenido a un partner
 
-## Configuración
-
-### Variables de Entorno
-
-- `DATABASE_URL`: URL de conexión a PostgreSQL
-- `PULSAR_SERVICE_URL`: URL del servicio Pulsar
-- `PULSAR_ADMIN_URL`: URL del admin de Pulsar
-- `FLASK_ENV`: Entorno de Flask (development/production)
-
-### Base de Datos
-
-El microservicio utiliza PostgreSQL con la siguiente estructura:
-
-- **Tabla**: `contenido`
-- **Esquema**: `content_management`
-- **Índices**: Optimizados para consultas por campaña, creador, marca, estado y tipo
-
-## Monitoreo
-
-- **Pulsar Manager**: http://localhost:9528
-- **Logs**: Disponibles en los contenedores Docker
-- **Métricas**: A través de los eventos publicados en Pulsar
-
-## Desarrollo
-
-### Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 src/content_management/

@@ -5,9 +5,7 @@ En este archivo se define el handler para crear contenido
 """
 
 from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CrearContenido
-from content_management.modulos.content_management.infraestructura.modelos import (
-    ContenidoDBModel, TipoContenidoEnum, EstadoContenidoEnum, CategoriaContenidoEnum
-)
+from content_management.modulos.content_management.infraestructura.modelos import ContenidoDBModel
 from content_management.seedwork.aplicacion.comandos import ejecutar_commando
 from content_management.infraestructura.pulsar import pulsar_publisher
 from content_management.config.db import db
@@ -23,50 +21,35 @@ def _(comando: CrearContenido):
     try:
         # Crear modelo de base de datos directamente
         contenido_model = ContenidoDBModel()
-        contenido_model.id = uuid.UUID(comando.id)
-        contenido_model.id_campana = uuid.UUID(comando.id_campana) if comando.id_campana else None
-        contenido_model.id_creador = uuid.UUID(comando.id_creador)
-        contenido_model.id_marca = uuid.UUID(comando.id_marca)
-        contenido_model.titulo = comando.titulo
-        contenido_model.descripcion = comando.descripcion
-        contenido_model.tipo_contenido = TipoContenidoEnum(comando.tipo_contenido)
-        contenido_model.categoria = CategoriaContenidoEnum(comando.categoria)
-        contenido_model.estado = EstadoContenidoEnum.BORRADOR
-        contenido_model.url_media = comando.url_media
-        contenido_model.hashtags = comando.hashtags
-        contenido_model.menciones = comando.menciones
-        contenido_model.plataformas = comando.plataformas
-        contenido_model.costo_produccion = comando.costo_produccion
-        
-        if comando.fecha_programada:
-            contenido_model.fecha_programada = datetime.fromisoformat(comando.fecha_programada)
-        if comando.fecha_creacion:
-            contenido_model.fecha_creacion = datetime.fromisoformat(comando.fecha_creacion)
-        if comando.fecha_actualizacion:
-            contenido_model.fecha_actualizacion = datetime.fromisoformat(comando.fecha_actualizacion)
-        
+        contenido_model.id = uuid.UUID(comando.id) if comando.id else uuid.uuid4()
+        contenido_model.creador = comando.creador
+        contenido_model.audiencia = comando.audiencia
+        contenido_model.campania = comando.campania
+        contenido_model.canales = comando.canales
+        contenido_model.marca = comando.marca
+        contenido_model.categoria = comando.categoria
+        contenido_model.fecha_creacion = datetime.fromisoformat(comando.fecha_creacion) if comando.fecha_creacion else datetime.utcnow()
+        contenido_model.fecha_actualizacion = datetime.fromisoformat(comando.fecha_actualizacion) if comando.fecha_actualizacion else datetime.utcnow()
+
         # Guardar en base de datos
         db.session.add(contenido_model)
         db.session.commit()
-        
-        # Crear y publicar evento de dominio
-        from content_management.modulos.content_management.dominio.entidades import ContenidoCreado
-        evento = ContenidoCreado(
-            id_contenido=contenido_model.id,
-            id_campana=contenido_model.id_campana,
-            id_creador=contenido_model.id_creador,
-            id_marca=contenido_model.id_marca,
-            titulo=contenido_model.titulo,
-            tipo_contenido=contenido_model.tipo_contenido.value,
-            categoria=contenido_model.categoria.value,
-            fecha_creacion=contenido_model.fecha_creacion
+
+        # Crear y publicar evento ContenidoAsociadoPartner
+        from content_management.modulos.content_management.dominio.entidades import ContenidoAsociadoPartner
+        evento = ContenidoAsociadoPartner(
+            identificacion=contenido_model.creador,
+            campania_asociada=contenido_model.campania,
+            canales=contenido_model.canales,
+            marca=contenido_model.marca,
+            categoria=contenido_model.categoria
         )
-        
+
         # Publicar evento en Pulsar
         pulsar_publisher.publish_event(evento, 'content-events')
-        
+
         logger.info(f"Contenido creado exitosamente: {contenido_model.id}")
-        
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error creando contenido: {e}")

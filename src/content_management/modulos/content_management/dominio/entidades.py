@@ -21,35 +21,6 @@ class Contenido(AgregacionRaiz):
     marca: str = field(default="")
     categoria: str = field(default="")
     
-    '''
-    def enviar_a_revision(self):
-        if self.estado == EstadoContenido.BORRADOR:
-            self.estado = EstadoContenido.EN_REVISION
-            self.fecha_ultima_actividad = datetime.now()
-            self.agregar_evento(ContenidoEnviadoRevision(
-                id_contenido=self.id,
-                id_campana=self.id_campana,
-                id_creador=self.id_creador,
-                id_marca=self.id_marca,
-                titulo=self.titulo,
-                fecha_envio=datetime.now()
-            ))
-    
-    def aprobar_contenido(self, aprobador: str = ""):
-        if self.estado == EstadoContenido.EN_REVISION:
-            self.estado = EstadoContenido.APROBADO
-            self.fecha_ultima_actividad = datetime.now()
-            self.agregar_evento(ContenidoAprobado(
-                id_contenido=self.id,
-                id_campana=self.id_campana,
-                id_creador=self.id_creador,
-                id_marca=self.id_marca,
-                titulo=self.titulo,
-                aprobador=aprobador,
-                fecha_aprobacion=datetime.now()
-            ))
-    '''
-    
 @dataclass
 class ContenidoAsociadoPartner(EventoDominio):
     identificacion: str = None

@@ -54,31 +54,14 @@ class EventConsumerService:
             
             logger.info(f"Procesando evento de contenido: {event_type}")
             
-            # Aquí se pueden agregar lógicas específicas para cada tipo de evento
-            if event_type == 'ContenidoCreado':
-                self._process_contenido_creado(event_payload)
-            elif event_type == 'ContenidoAprobado':
-                self._process_contenido_aprobado(event_payload)
-            elif event_type == 'ContenidoPublicado':
-                self._process_contenido_publicado(event_payload)
-            elif event_type == 'ContenidoArchivado':
-                self._process_contenido_archivado(event_payload)
-                
+            self._process_contenido(event_payload)
+
         except Exception as e:
             logger.error(f"Error procesando evento de contenido: {e}")
     
     # Métodos de procesamiento específicos para cada evento
-    def _process_contenido_creado(self, payload):
-        logger.info(f"Contenido creado: {payload.get('id_contenido')}")
-    
-    def _process_contenido_aprobado(self, payload):
-        logger.info(f"Contenido aprobado: {payload.get('id_contenido')}")
-    
-    def _process_contenido_publicado(self, payload):
-        logger.info(f"Contenido publicado: {payload.get('id_contenido')}")
-    
-    def _process_contenido_archivado(self, payload):
-        logger.info(f"Contenido archivado: {payload.get('id_contenido')}")
+    def _process_contenido(self, payload):
+        logger.info(f"Contenido procesado: {payload.get('id_contenido')}")
 
 # Instancia global del servicio
 event_consumer_service = EventConsumerService()

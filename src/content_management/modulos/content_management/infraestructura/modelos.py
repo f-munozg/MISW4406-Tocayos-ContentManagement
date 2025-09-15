@@ -15,7 +15,7 @@ class ContenidoDBModel(db.Model):
     __tablename__ = "contenido"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    creador = Column(String(255), nullable=False)
+    creador = Column(String(255), nullable=False, default=lambda: str(uuid.uuid4()))
     audiencia = Column(String(255), nullable=False)
     campania = Column(String(255), nullable=False)
     canales = Column(String(255), nullable=False)
@@ -25,4 +25,4 @@ class ContenidoDBModel(db.Model):
     fecha_actualizacion = Column(DateTime, nullable=False, default=datetime.utcnow)
     
     def __repr__(self):
-        return f"<Contenido {self.titulo} ({self.estado.value})>"
+        return f"<Contenido de campania: {self.campania}, creador: {self.creador}, marca: ({self.marca})>"

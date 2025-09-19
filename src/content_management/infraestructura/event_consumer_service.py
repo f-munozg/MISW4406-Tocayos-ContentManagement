@@ -7,16 +7,19 @@ En este archivo se define el servicio principal para consumir eventos de Pulsar
 import json
 import logging
 import threading
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from content_management.infraestructura.pulsar import PulsarEventConsumer, PulsarConfig
+from content_management.modulos.content_management.aplicacion.handlers.event_handler import EventHandler
 
 logger = logging.getLogger(__name__)
 
 class EventConsumerService:
-    def __init__(self):
+    def __init__(self, app=None, event_handler: Optional[EventHandler] = None):
         self.config = PulsarConfig()
         self.consumers = {}
         self.running = False
+        self.app = app
+        self.event_handler = event_handler
         
     def start_consuming(self):
         """Inicia el consumo de eventos para todos los módulos"""
@@ -47,21 +50,20 @@ class EventConsumerService:
             logger.error(f"Error iniciando consumidor para {event_type}: {e}")
     
     def _handle_content_event(self, event_data: Dict[str, Any]):
-        """Maneja eventos de contenido"""
+        """Maneja eventos de contenido delegando al event handler"""
         try:
             event_type = event_data.get('event_type')
             event_payload = event_data.get('event_data', {})
             
             logger.info(f"Procesando evento de contenido: {event_type}")
             
-            self._process_contenido(event_payload)
+            if self.event_handler:
+                self.event_handler.handle_event(event_type, event_payload)
+            else:
+                logger.warning("No event handler configured, skipping event processing")
 
         except Exception as e:
             logger.error(f"Error procesando evento de contenido: {e}")
-    
-    # Métodos de procesamiento específicos para cada evento
-    def _process_contenido(self, payload):
-        logger.info(f"Contenido procesado: {payload.get('id_contenido')}")
 
 # Instancia global del servicio
 event_consumer_service = EventConsumerService()

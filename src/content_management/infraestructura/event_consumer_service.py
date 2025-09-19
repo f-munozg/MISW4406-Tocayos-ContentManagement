@@ -43,19 +43,30 @@ class EventConsumerService:
             consumer = PulsarEventConsumer()
             topic_name = self.config.get_topic_name(event_type)
             subscription_name = f"{event_type}-subscription"
+            
+            logger.info(f"Subscribing to topic: {topic_name}")
+            logger.info(f"Using subscription: {subscription_name}")
+            logger.info(f"Pulsar service URL: {self.config.service_url}")
+            
             consumer.subscribe_to_topic(topic_name, subscription_name, handler)
             self.consumers[event_type] = consumer
-            logger.info(f"Consumidor iniciado para {event_type}")
+            logger.info(f"Consumidor iniciado para {event_type} en topic {topic_name}")
         except Exception as e:
             logger.error(f"Error iniciando consumidor para {event_type}: {e}")
+            logger.error(f"Topic name: {topic_name}")
+            logger.error(f"Service URL: {self.config.service_url}")
     
     def _handle_content_event(self, event_data: Dict[str, Any]):
         """Maneja eventos de contenido delegando al event handler"""
         try:
+            logger.info(f"Received content event: {event_data}")
+            
+            # Handle different event structures
             event_type = event_data.get('event_type')
-            event_payload = event_data.get('event_data', {})
+            event_payload = event_data.get('event_data', event_data)  # Fallback to full event_data
             
             logger.info(f"Procesando evento de contenido: {event_type}")
+            logger.info(f"Event payload: {event_payload}")
             
             if self.event_handler:
                 self.event_handler.handle_event(event_type, event_payload)
@@ -64,6 +75,7 @@ class EventConsumerService:
 
         except Exception as e:
             logger.error(f"Error procesando evento de contenido: {e}")
+            logger.error(f"Event data: {event_data}")
 
 # Instancia global del servicio
 event_consumer_service = EventConsumerService()

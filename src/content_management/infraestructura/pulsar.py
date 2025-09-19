@@ -67,6 +67,9 @@ class PulsarEventPublisher:
             # Serializar el evento
             event_data = self._serialize_event(evento)
             
+            if event_type == 'content-events':
+                event_data = self._alternate_serialize_event(evento)
+
             # Publicar el evento
             producer.send(event_data.encode('utf-8'))
             logger.info(f"Evento publicado en {topic_name}: {evento.__class__.__name__}")
@@ -82,6 +85,19 @@ class PulsarEventPublisher:
             'event_data': evento.__dict__,
             'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
         }
+        return json.dumps(event_dict, default=str)
+    
+    def _alternate_serialize_event(self, evento: EventoDominio) -> str:
+        """Serializa un evento a JSON alternativo"""
+        event_dict = {
+            'event_type': evento.__class__.__name__,
+            'event_data': evento.__dict__,
+            'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
+        }
+
+        if evento.__class__.__name__ == 'ContenidoAsociadoPartner':
+            event_dict['event_type'] = 'PartnershipIniciada'
+
         return json.dumps(event_dict, default=str)
     
     def close(self):

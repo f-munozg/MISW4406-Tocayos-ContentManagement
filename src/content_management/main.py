@@ -41,12 +41,16 @@ def create_app():
     try:
         from content_management.infraestructura.event_consumer_service import EventConsumerService
         from content_management.infraestructura.pulsar import pulsar_publisher
+        from content_management.modulos.content_management.aplicacion.handlers.contenido_event_handler import ContenidoEventHandler
         import atexit
         
-        # Iniciar el servicio de consumo de eventos
-        event_consumer_service = EventConsumerService(app)
+        # Crear el event handler
+        contenido_event_handler = ContenidoEventHandler()
+        
+        # Iniciar el servicio de consumo de eventos con el handler
+        event_consumer_service = EventConsumerService(app, contenido_event_handler)
         event_consumer_service.start_consuming()
-        logger.info("Servicio de consumo de eventos iniciado")
+        logger.info("Servicio de consumo de eventos iniciado con ContenidoEventHandler")
         
         # Registrar función de limpieza al cerrar la aplicación
         atexit.register(cleanup_pulsar_connections)

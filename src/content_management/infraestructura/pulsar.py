@@ -67,7 +67,7 @@ class PulsarEventPublisher:
             # Serializar el evento
             event_data = self._serialize_event(evento)
             
-            if event_type == 'content-events':
+            if event_type == 'partner-events':
                 event_data = self._alternate_serialize_event(evento)
 
             # Publicar el evento

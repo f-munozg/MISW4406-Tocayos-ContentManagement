@@ -69,7 +69,12 @@ class EventConsumerService:
             logger.info(f"Event payload: {event_payload}")
             
             if self.event_handler:
-                self.event_handler.handle_event(event_type, event_payload)
+                # Ensure we're in a Flask app context when using the event handler
+                if self.app:
+                    with self.app.app_context():
+                        self.event_handler.handle_event(event_type, event_payload)
+                else:
+                    logger.warning("No Flask app context available for event handler")
             else:
                 logger.warning("No event handler configured, skipping event processing")
 

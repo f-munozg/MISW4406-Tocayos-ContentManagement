@@ -82,5 +82,12 @@ class EventConsumerService:
             logger.error(f"Error procesando evento de contenido: {e}")
             logger.error(f"Event data: {event_data}")
 
-# Instancia global del servicio
-event_consumer_service = EventConsumerService()
+# Instancia global del servicio - será creada con Flask app context
+event_consumer_service = None
+
+def create_event_consumer_service(app, event_handler=None):
+    """Create the event consumer service with Flask app context"""
+    global event_consumer_service
+    if event_consumer_service is None:
+        event_consumer_service = EventConsumerService(app, event_handler)
+    return event_consumer_service

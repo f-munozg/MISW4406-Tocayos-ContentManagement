@@ -39,7 +39,7 @@ def create_app():
     
     # Inicializar servicios de Pulsar (opcional)
     try:
-        from content_management.infraestructura.event_consumer_service import EventConsumerService
+        from content_management.infraestructura.event_consumer_service import create_event_consumer_service
         from content_management.infraestructura.pulsar import pulsar_publisher
         from content_management.modulos.content_management.aplicacion.handlers.contenido_event_handler import ContenidoEventHandler
         import atexit
@@ -48,7 +48,7 @@ def create_app():
         contenido_event_handler = ContenidoEventHandler()
         
         # Iniciar el servicio de consumo de eventos con el handler
-        event_consumer_service = EventConsumerService(app, contenido_event_handler)
+        event_consumer_service = create_event_consumer_service(app, contenido_event_handler)
         event_consumer_service.start_consuming()
         logger.info("Servicio de consumo de eventos iniciado con ContenidoEventHandler")
         

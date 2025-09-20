@@ -47,7 +47,7 @@ def _(comando: BuscarContenido):
 
         # Publicar evento en Pulsar
         # pulsar_publisher.publish_event(evento, 'content-events')
-        pulsar_publisher.publish_event(evento, 'partner-events')
+        pulsar_publisher.publish_event(evento, 'partner-events', 'Success')
 
         logger.info(f"Contenido creado exitosamente: {contenido_model.id}")
 

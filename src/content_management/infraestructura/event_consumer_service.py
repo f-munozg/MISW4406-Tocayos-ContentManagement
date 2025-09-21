@@ -24,11 +24,76 @@ class EventConsumerService:
     def start_consuming(self):
         """Inicia el consumo de eventos para todos los módulos"""
         self.running = True
-        
-        # Eventos de contenido
+
+        # Escuchar eventos de contenido y campaña
         self._start_consumer('content-events', self._handle_content_event)
-        
+        self._start_consumer('campaign-events', self._handle_campaign_event)
+
         logger.info("Servicio de consumo de eventos iniciado")
+    def _handle_campaign_event(self, event_data: Dict[str, Any]):
+        """Maneja eventos de campaign-events para la saga"""
+        try:
+            logger.info(f"Received campaign event: {event_data}")
+            event_type = event_data.get('event_type')
+            status = event_data.get('status')
+            saga_id = event_data.get('saga_id')
+            payload = event_data.get('event_data', event_data)
+
+            logger.info(f"Procesando evento de campaña: {event_type} con status: {status}")
+
+            # Saga: Si recibimos EventCampaignCreated con status success, lanzamos CommandCreatePartner
+            if event_type == 'EventCampaignCreated' and status == 'success':
+                from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandCreatePartner
+                from content_management.seedwork.aplicacion.comandos import ejecutar_commando
+                # Extraer los datos necesarios del payload
+                comando = CommandCreatePartner(
+                    saga_id=saga_id,
+                    id=payload.get('id'),
+                    id_marca=payload.get('id_marca'),
+                    id_partner=payload.get('id_partner'),
+                    tipo_partnership=payload.get('tipo_partnership', ''),
+                    terminos_contrato=payload.get('terminos_contrato', ''),
+                    comision_porcentaje=payload.get('comision_porcentaje', 0.0),
+                    metas_mensuales=payload.get('metas_mensuales', ''),
+                    beneficios_adicionales=payload.get('beneficios_adicionales', ''),
+                    notas=payload.get('notas', ''),
+                    fecha_creacion=payload.get('fecha_creacion', ''),
+                    fecha_actualizacion=payload.get('fecha_actualizacion', '')
+                )
+                ejecutar_commando(comando)
+                logger.info(f"CommandCreatePartner lanzado por saga para id_partner: {payload.get('id_partner')}")
+
+        except Exception as e:
+            logger.error(f"Error procesando evento de campaña: {e}")
+            logger.error(f"Event data: {event_data}")
+
+    def _handle_content_event(self, event_data: Dict[str, Any]):
+        """Maneja eventos de content-events para la saga"""
+        try:
+            logger.info(f"Received content event: {event_data}")
+            event_type = event_data.get('event_type')
+            status = event_data.get('status')
+            saga_id = event_data.get('saga_id')
+            payload = event_data.get('event_data', event_data)
+
+            logger.info(f"Procesando evento de contenido: {event_type} con status: {status}")
+
+            # Saga: Si CommandCreatePartner falla, lanzamos CommandContentRollbacked
+            if event_type == 'CommandCreatePartner' and status == 'failed':
+                from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandContentRollbacked
+                from content_management.seedwork.aplicacion.comandos import ejecutar_commando
+                comando = CommandContentRollbacked(
+                    saga_id=saga_id,
+                    id=payload.get('id'),
+                    motivo=payload.get('motivo', 'Error en creación de partner'),
+                    fecha_rollback=''
+                )
+                ejecutar_commando(comando)
+                logger.info(f"CommandContentRollbacked lanzado por saga para id: {payload.get('id')}")
+
+        except Exception as e:
+            logger.error(f"Error procesando evento de contenido: {e}")
+            logger.error(f"Event data: {event_data}")
     
     def stop_consuming(self):
         """Detiene el consumo de eventos"""

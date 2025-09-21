@@ -13,11 +13,9 @@ from typing import Dict, Any
 from pulsar import Client, Producer, Consumer
 from content_management.seedwork.dominio.eventos import EventoDominio
 
-# Try to import ConsumerType, fallback to string if not available
 try:
     from pulsar import ConsumerType
 except ImportError:
-    # Fallback: use string values for consumer types
     class ConsumerType:
         Shared = "Shared"
         Exclusive = "Exclusive"
@@ -59,28 +57,28 @@ class PulsarEventPublisher:
             self.producers[topic_name] = client.create_producer(topic_name)
         return self.producers[topic_name]
     
-    def publish_event(self, evento: EventoDominio, event_type: str, status: str):
-        """Publica un evento en Pulsar"""
+    def publish_event(self, saga_id, evento: EventoDominio, event_type: str, status: str):
+        """Publica un evento en Pulsar con estructura de saga"""
         try:
             topic_name = self.config.get_topic_name(event_type)
             producer = self._get_producer(topic_name)
-            
-            # Serializar el evento
+
+            # Serializar el evento siguiendo la estructura de saga
             event_dict = {
-                'saga_id': uuid.uuid4(),
+                'saga_id': saga_id,  # Debe venir de upstream
                 'service': 'Content',
-                'status': status, 
-                'event_id': evento.id,
+                'status': status,
+                'event_id': getattr(evento, 'id', None),
                 'event_type': event_type,
                 'event_data': evento.__dict__,
-                'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
+                'timestamp': getattr(evento, 'fecha_evento', None).isoformat() if hasattr(evento, 'fecha_evento') and evento.fecha_evento else None
             }
-            event_data=json.dumps(event_dict, default=str)
+            event_data = json.dumps(event_dict, default=str)
 
             # Publicar el evento
             producer.send(event_data.encode('utf-8'))
             logger.info(f"Evento publicado en {topic_name}: {evento.__class__.__name__}")
-            
+
         except Exception as e:
             logger.error(f"Error publicando evento en Pulsar: {e}")
             raise

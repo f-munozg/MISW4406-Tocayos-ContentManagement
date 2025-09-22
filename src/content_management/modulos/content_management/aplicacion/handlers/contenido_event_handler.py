@@ -42,8 +42,8 @@ class ContenidoEventHandler(EventHandler):
             
             # Create BuscarContenido command
             comando = BuscarContenido(
-                saga_id=event_data.get('saga_id', ''),
                 id=contenido_dto.id,
+                saga_id=event_data.get('saga_id', ''),
                 creador=contenido_dto.creador,
                 audiencia=contenido_dto.audiencia,
                 campania=contenido_dto.campania,

@@ -33,8 +33,8 @@ class CommandContentRollbacked(Comando):
 
 @dataclass
 class BuscarContenido(Comando):
-    saga_id: str = ""
     id: str
+    saga_id: str = ""
     creador: str = ""
     audiencia: str = ""
     campania: str = ""

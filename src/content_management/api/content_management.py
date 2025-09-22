@@ -40,8 +40,8 @@ def buscar_contenido():
         # Build BuscarContenido command with only the required fields
         from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import BuscarContenido
         comando = BuscarContenido(
-            saga_id=event_body.get('saga_id', ''),
             id=contenido_dto.id,
+            saga_id=event_body.get('saga_id', ''),
             creador=contenido_dto.creador,
             audiencia=contenido_dto.audiencia,
             campania=contenido_dto.campania,

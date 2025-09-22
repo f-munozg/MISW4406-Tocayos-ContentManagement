@@ -57,8 +57,8 @@ class EventConsumerService:
                         
                         # Build BuscarContenido command with saga_id
                         comando = BuscarContenido(
-                            saga_id=saga_id,
                             id=contenido_dto.id,
+                            saga_id=saga_id,
                             creador=contenido_dto.creador,
                             audiencia=contenido_dto.audiencia,
                             campania=contenido_dto.campania,

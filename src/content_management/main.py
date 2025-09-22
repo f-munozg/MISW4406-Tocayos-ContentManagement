@@ -26,6 +26,7 @@ def create_app():
     # Importar handlers de comandos para registrar los dispatchers
     try:
         from content_management.modulos.content_management.aplicacion.handlers import crear_contenido_handler
+        from content_management.modulos.content_management.aplicacion.handlers import crear_partner_handler
         logger.info("Handlers de content management registrados")
     except Exception as e:
         logger.error(f"Error registrando handlers de content management: {e}")

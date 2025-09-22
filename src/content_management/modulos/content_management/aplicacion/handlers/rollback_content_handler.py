@@ -32,6 +32,15 @@ def _(comando: CommandContentRollbacked):
             'failed'
         )
 
+        # Publicar evento en Pulsar con saga_id y status
+        pulsar_publisher.publish_event(
+            comando.saga_id,
+            evento,
+            'CommandContentRollbacked',
+            "content-events",
+            'success'
+        )
+
         logger.info(f"CommandContentRollbacked publicado exitosamente para id: {comando.id}")
 
     except Exception as e:

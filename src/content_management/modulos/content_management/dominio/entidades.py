@@ -23,8 +23,14 @@ class Contenido(AgregacionRaiz):
     
 @dataclass
 class CommandCreatePartner(EventoDominio):
-    identificacion: str = None
-    campania_asociada: str = None
-    canales: str = None
-    marca: str = None
-    categoria: str = None
+    id: str = ""
+    id_marca: str = ""
+    id_partner: str = ""
+    tipo_partnership: str = ""
+    terminos_contrato: str = ""
+    comision_porcentaje: float = 0.0
+    metas_mensuales: str = ""
+    beneficios_adicionales: str = ""
+    notas: str = ""
+    fecha_creacion: str = ""
+    fecha_actualizacion: str = ""

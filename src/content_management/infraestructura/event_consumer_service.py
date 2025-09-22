@@ -41,31 +41,36 @@ class EventConsumerService:
 
             logger.info(f"Procesando evento de campaña: {event_type} con status: {status}")
 
-            # Saga: Si recibimos EventCampaignCreated con status success, lanzamos CommandCreatePartner
+            # Saga: Si recibimos EventCampaignCreated con status success, lanzamos BuscarContenido
             if event_type == 'EventCampaignCreated' and status == 'success':
-                from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandCreatePartner
+                from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import BuscarContenido
+                from content_management.modulos.content_management.aplicacion.mapeadores import MapeadorContenidoDTOJson
                 from content_management.seedwork.aplicacion.comandos import ejecutar_commando
+                from datetime import datetime
                 
                 # Ensure we're in a Flask app context when executing commands
                 if self.app:
                     with self.app.app_context():
-                        # Extraer los datos necesarios del payload
-                        comando = CommandCreatePartner(
+                        # Map the event data to DTO using the mapeador
+                        map_contenido = MapeadorContenidoDTOJson()
+                        contenido_dto = map_contenido.externo_a_dto(event_data)
+                        
+                        # Build BuscarContenido command with saga_id
+                        comando = BuscarContenido(
                             saga_id=saga_id,
-                            id=payload.get('id'),
-                            id_marca=payload.get('id_marca'),
-                            id_partner=payload.get('id_partner'),
-                            tipo_partnership=payload.get('tipo_partnership', ''),
-                            terminos_contrato=payload.get('terminos_contrato', ''),
-                            comision_porcentaje=payload.get('comision_porcentaje', 0.0),
-                            metas_mensuales=payload.get('metas_mensuales', ''),
-                            beneficios_adicionales=payload.get('beneficios_adicionales', ''),
-                            notas=payload.get('notas', ''),
-                            fecha_creacion=payload.get('fecha_creacion', ''),
-                            fecha_actualizacion=payload.get('fecha_actualizacion', '')
+                            id=contenido_dto.id,
+                            creador=contenido_dto.creador,
+                            audiencia=contenido_dto.audiencia,
+                            campania=contenido_dto.campania,
+                            canales=contenido_dto.canales,
+                            marca=contenido_dto.marca,
+                            categoria=contenido_dto.categoria,
+                            fecha_creacion=contenido_dto.fecha_creacion or datetime.now().isoformat(),
+                            fecha_actualizacion=contenido_dto.fecha_actualizacion or datetime.now().isoformat()
                         )
+ 
                         ejecutar_commando(comando)
-                        logger.info(f"CommandCreatePartner lanzado por saga para id_partner: {payload.get('id_partner')}")
+                        logger.info(f"BuscarContenido lanzado por saga para id: {contenido_dto.id}")
                 else:
                     logger.warning("No Flask app context available for campaign event processing")
 

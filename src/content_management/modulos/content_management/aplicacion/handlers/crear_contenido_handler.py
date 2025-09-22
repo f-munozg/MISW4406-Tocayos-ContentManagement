@@ -37,17 +37,25 @@ def _(comando: BuscarContenido):
 
         # Crear y publicar evento CommandCreatePartner
         from content_management.modulos.content_management.dominio.entidades import CommandCreatePartner
-        evento = CommandCreatePartner(
-            identificacion=contenido_model.creador,
-            campania_asociada=contenido_model.campania,
-            canales=contenido_model.canales,
-            marca=contenido_model.marca,
-            categoria=contenido_model.categoria
+        from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandCreatePartner as CommandCreatePartnerCmd
+        
+        
+        # Create and execute the command
+        comando = CommandCreatePartnerCmd(
+            saga_id=comando.saga_id,
+            id=str(contenido_model.id),
+            id_marca=contenido_model.marca,
+            id_partner=str(contenido_model.id),  # Use content ID as partner ID for now
+            tipo_partnership='content_partnership',
+            terminos_contrato='',
+            comision_porcentaje=0.0,
+            metas_mensuales='',
+            beneficios_adicionales='',
+            notas='',
+            fecha_creacion=contenido_model.fecha_creacion.isoformat() if contenido_model.fecha_creacion else datetime.utcnow().isoformat(),
+            fecha_actualizacion=contenido_model.fecha_actualizacion.isoformat() if contenido_model.fecha_actualizacion else datetime.utcnow().isoformat()
         )
-
-        # Publicar evento en Pulsar
-        # pulsar_publisher.publish_event(evento, 'content-events')
-        pulsar_publisher.publish_event(evento, 'partner-events', 'Success')
+        ejecutar_commando(comando)
 
         logger.info(f"Contenido creado exitosamente: {contenido_model.id}")
 

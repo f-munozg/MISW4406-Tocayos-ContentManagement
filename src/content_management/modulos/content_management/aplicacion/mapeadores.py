@@ -11,16 +11,19 @@ import uuid
 class MapeadorContenidoDTOJson:
 
     def externo_a_dto(self, externo: dict) -> ContenidoDTO:
+        # Handle both direct event data and nested event_data
+        event_data = externo.get('event_data', externo)
+        
         return ContenidoDTO(
-            id=externo.get('id', str(uuid.uuid4())),
-            creador=externo.get('creador', str(uuid.uuid4())),
-            audiencia=externo.get('audiencia', ''),
-            campania=externo.get('campania', ''),
-            canales=externo.get('canales', ''),
-            marca=externo.get('marca', ''),
-            categoria=externo.get('categoria', ''),
-            fecha_creacion=externo.get('fecha_creacion', ''),
-            fecha_actualizacion=externo.get('fecha_actualizacion', '')
+            id=event_data.get('id', str(uuid.uuid4())),
+            creador=event_data.get('creador', event_data.get('tipo', 'campaign_created')),  # Use 'tipo' as creator if no creator field
+            audiencia=event_data.get('audiencia', ''),
+            campania=event_data.get('campania', event_data.get('tipo', '')),  # Use 'tipo' as campaign if no campaign field
+            canales=event_data.get('canales', ''),
+            marca=event_data.get('marca', ''),
+            categoria=event_data.get('categoria', ''),
+            fecha_creacion=event_data.get('fecha_creacion', event_data.get('fecha_evento', '')),
+            fecha_actualizacion=event_data.get('fecha_actualizacion', event_data.get('fecha_evento', ''))
         )
     
     def dto_a_externo(self, dto: ContenidoDTO) -> dict:

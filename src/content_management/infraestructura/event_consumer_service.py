@@ -30,16 +30,16 @@ class EventConsumerService:
         self._start_consumer('campaign-events', self._handle_campaign_event)
 
         logger.info("Servicio de consumo de eventos iniciado")
+        
     def _handle_campaign_event(self, event_data: Dict[str, Any]):
         """Maneja eventos de campaign-events para la saga"""
         try:
-            logger.info(f"Received campaign event: {event_data}")
             event_type = event_data.get('event_type')
             status = event_data.get('status')
             saga_id = event_data.get('saga_id')
             payload = event_data.get('event_data', event_data)
 
-            logger.info(f"Procesando evento de campaña: {event_type} con status: {status}")
+            logger.info(f"Procesando evento de campaña: {event_type} con status: {status} y saga_id: {saga_id}")
 
             # Saga: Si recibimos EventCampaignCreated con status success, lanzamos BuscarContenido
             if event_type == 'EventCampaignCreated' and status == 'success':
@@ -87,7 +87,7 @@ class EventConsumerService:
             saga_id = event_data.get('saga_id')
             payload = event_data.get('event_data', event_data)
 
-            logger.info(f"Procesando evento de contenido: {event_type} con status: {status}")
+            logger.info(f"Procesando evento de campaña: {event_type} con status: {status} y saga_id: {saga_id}")
 
             # Saga: Si CommandCreatePartner falla, lanzamos CommandContentRollbacked
             if event_type == 'CommandCreatePartner' and status == 'failed':
@@ -124,7 +124,7 @@ class EventConsumerService:
         try:
             consumer = PulsarEventConsumer()
             topic_name = self.config.get_topic_name(event_type)
-            subscription_name = f"{event_type}-subscription"
+            subscription_name = f"content-management-subscription"
             
             logger.info(f"Subscribing to topic: {topic_name}")
             logger.info(f"Using subscription: {subscription_name}")

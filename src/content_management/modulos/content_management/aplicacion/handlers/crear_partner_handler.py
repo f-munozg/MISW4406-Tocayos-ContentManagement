@@ -39,6 +39,7 @@ def _(comando: CommandCreatePartner):
             comando.saga_id,
             evento,
             'CommandCreatePartner',
+            "content-events",
             'success'
         )
 
@@ -52,6 +53,7 @@ def _(comando: CommandCreatePartner):
             comando.saga_id,
             evento,
             'CommandCreatePartner',
+            "content-events",
             'failed'
         )
         raise

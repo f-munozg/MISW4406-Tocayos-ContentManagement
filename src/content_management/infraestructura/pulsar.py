@@ -57,10 +57,10 @@ class PulsarEventPublisher:
             self.producers[topic_name] = client.create_producer(topic_name)
         return self.producers[topic_name]
     
-    def publish_event(self, saga_id, evento: EventoDominio, event_type: str, status: str):
+    def publish_event(self, saga_id, evento: EventoDominio, event_type: str, topic: str, status: str):
         """Publica un evento en Pulsar con estructura de saga"""
         try:
-            topic_name = self.config.get_topic_name(event_type)
+            topic_name = self.config.get_topic_name(topic)
             producer = self._get_producer(topic_name)
 
             # Serializar el evento siguiendo la estructura de saga
@@ -82,28 +82,6 @@ class PulsarEventPublisher:
         except Exception as e:
             logger.error(f"Error publicando evento en Pulsar: {e}")
             raise
-    
-    # def _serialize_event(self, evento: EventoDominio) -> str:
-    #     """Serializa un evento a JSON"""
-    #     event_dict = {
-    #         'event_type': evento.__class__.__name__,
-    #         'event_data': evento.__dict__,
-    #         'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
-    #     }
-    #     return json.dumps(event_dict, default=str)
-    
-    # def _alternate_serialize_event(self, evento: EventoDominio) -> str:
-    #     """Serializa un evento a JSON alternativo"""
-    #     event_dict = {
-    #         'event_type': evento.__class__.__name__,
-    #         'event_data': evento.__dict__,
-    #         'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
-    #     }
-
-    #     if evento.__class__.__name__ == 'CommandCreatePartner':
-    #         event_dict['event_type'] = 'PartnershipIniciada'
-
-    #     return json.dumps(event_dict, default=str)
     
     def close(self):
         """Cierra todas las conexiones"""

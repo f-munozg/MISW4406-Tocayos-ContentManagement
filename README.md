@@ -84,7 +84,7 @@ Permite buscar el contenido asociado a una campaña.
 
 El microservicio publica los siguientes eventos en Pulsar:
 
-- `ContenidoAsociadoPartner` - Cuando se buscar asociar contenido a un partner
+- `CommandCreatePartner` - Cuando se buscar asociar contenido a un partner
 
 ## Estructura del Proyecto
 

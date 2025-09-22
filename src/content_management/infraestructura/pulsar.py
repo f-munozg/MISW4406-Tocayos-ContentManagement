@@ -100,7 +100,7 @@ class PulsarEventPublisher:
     #         'timestamp': evento.fecha_evento.isoformat() if hasattr(evento, 'fecha_evento') else None
     #     }
 
-    #     if evento.__class__.__name__ == 'ContenidoAsociadoPartner':
+    #     if evento.__class__.__name__ == 'CommandCreatePartner':
     #         event_dict['event_type'] = 'PartnershipIniciada'
 
     #     return json.dumps(event_dict, default=str)

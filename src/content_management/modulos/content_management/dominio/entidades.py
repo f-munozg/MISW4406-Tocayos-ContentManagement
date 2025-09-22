@@ -22,7 +22,7 @@ class Contenido(AgregacionRaiz):
     categoria: str = field(default="")
     
 @dataclass
-class ContenidoAsociadoPartner(EventoDominio):
+class CommandCreatePartner(EventoDominio):
     identificacion: str = None
     campania_asociada: str = None
     canales: str = None

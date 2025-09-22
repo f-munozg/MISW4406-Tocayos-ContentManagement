@@ -27,7 +27,7 @@ bp = Blueprint('content_management', __name__, url_prefix='/content-management')
 @bp.route('/buscar-contenido', methods=['POST'])
 def buscar_contenido():
     """
-    Endpoint to receive an event body, create a content record, and publish ContenidoAsociadoPartner event.
+    Endpoint to receive an event body, create a content record, and publish CommandCreatePartner event.
     """
     try:
         event_body = request.json

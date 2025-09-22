@@ -35,9 +35,9 @@ def _(comando: BuscarContenido):
         db.session.add(contenido_model)
         db.session.commit()
 
-        # Crear y publicar evento ContenidoAsociadoPartner
-        from content_management.modulos.content_management.dominio.entidades import ContenidoAsociadoPartner
-        evento = ContenidoAsociadoPartner(
+        # Crear y publicar evento CommandCreatePartner
+        from content_management.modulos.content_management.dominio.entidades import CommandCreatePartner
+        evento = CommandCreatePartner(
             identificacion=contenido_model.creador,
             campania_asociada=contenido_model.campania,
             canales=contenido_model.canales,

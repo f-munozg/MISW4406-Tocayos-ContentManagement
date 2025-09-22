@@ -49,7 +49,7 @@ def _(comando: BuscarContenido):
             tipo_partnership='marca_embajador',
             terminos_contrato='',
             comision_porcentaje=0.0,
-            metas_mensuales='',
+            metas_mensuales=0,
             beneficios_adicionales='',
             notas='',
             fecha_creacion=contenido_model.fecha_creacion.isoformat() if contenido_model.fecha_creacion else datetime.utcnow().isoformat(),

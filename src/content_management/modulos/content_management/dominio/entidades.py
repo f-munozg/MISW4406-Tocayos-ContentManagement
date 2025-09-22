@@ -29,7 +29,7 @@ class CommandCreatePartner(EventoDominio):
     tipo_partnership: str = ""
     terminos_contrato: str = ""
     comision_porcentaje: float = 0.0
-    metas_mensuales: str = ""
+    metas_mensuales: int = 0
     beneficios_adicionales: str = ""
     notas: str = ""
     fecha_creacion: str = ""

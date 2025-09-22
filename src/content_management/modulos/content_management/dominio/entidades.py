@@ -34,3 +34,9 @@ class CommandCreatePartner(EventoDominio):
     notas: str = ""
     fecha_creacion: str = ""
     fecha_actualizacion: str = ""
+
+@dataclass
+class CommandContentRollbacked(EventoDominio):
+    id: str = ""
+    motivo: str = ""
+    fecha_rollback: str = ""

@@ -28,6 +28,7 @@ def _(comando: CommandContentRollbacked):
             comando.saga_id,
             evento,
             'CommandContentRollbacked',
+            "content-events",
             'success'
         )
 
@@ -40,6 +41,7 @@ def _(comando: CommandContentRollbacked):
             comando.saga_id,
             evento,
             'CommandContentRollbacked',
+            "content-events",
             'failed'
         )
         raise

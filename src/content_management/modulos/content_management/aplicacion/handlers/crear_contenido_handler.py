@@ -46,7 +46,7 @@ def _(comando: BuscarContenido):
             id=str(contenido_model.id),
             id_marca=contenido_model.marca,
             id_partner=str(contenido_model.id),  # Use content ID as partner ID for now
-            tipo_partnership='content_partnership',
+            tipo_partnership='marca_embajador',
             terminos_contrato='',
             comision_porcentaje=0.0,
             metas_mensuales='',

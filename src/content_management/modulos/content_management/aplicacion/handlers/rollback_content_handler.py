@@ -27,9 +27,9 @@ def _(comando: CommandContentRollbacked):
         pulsar_publisher.publish_event(
             comando.saga_id,
             evento,
-            'CommandContentRollbacked',
-            "content-events",
-            'success'
+            'EventCampaignCreated',
+            "campaign-events",
+            'failed'
         )
 
         logger.info(f"CommandContentRollbacked publicado exitosamente para id: {comando.id}")
@@ -40,8 +40,8 @@ def _(comando: CommandContentRollbacked):
         pulsar_publisher.publish_event(
             comando.saga_id,
             evento,
-            'CommandContentRollbacked',
-            "content-events",
+             'EventCampaignCreated',
+            "campaign-events",
             'failed'
         )
         raise

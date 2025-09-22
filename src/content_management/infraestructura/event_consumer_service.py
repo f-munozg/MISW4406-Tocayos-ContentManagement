@@ -45,23 +45,29 @@ class EventConsumerService:
             if event_type == 'EventCampaignCreated' and status == 'success':
                 from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandCreatePartner
                 from content_management.seedwork.aplicacion.comandos import ejecutar_commando
-                # Extraer los datos necesarios del payload
-                comando = CommandCreatePartner(
-                    saga_id=saga_id,
-                    id=payload.get('id'),
-                    id_marca=payload.get('id_marca'),
-                    id_partner=payload.get('id_partner'),
-                    tipo_partnership=payload.get('tipo_partnership', ''),
-                    terminos_contrato=payload.get('terminos_contrato', ''),
-                    comision_porcentaje=payload.get('comision_porcentaje', 0.0),
-                    metas_mensuales=payload.get('metas_mensuales', ''),
-                    beneficios_adicionales=payload.get('beneficios_adicionales', ''),
-                    notas=payload.get('notas', ''),
-                    fecha_creacion=payload.get('fecha_creacion', ''),
-                    fecha_actualizacion=payload.get('fecha_actualizacion', '')
-                )
-                ejecutar_commando(comando)
-                logger.info(f"CommandCreatePartner lanzado por saga para id_partner: {payload.get('id_partner')}")
+                
+                # Ensure we're in a Flask app context when executing commands
+                if self.app:
+                    with self.app.app_context():
+                        # Extraer los datos necesarios del payload
+                        comando = CommandCreatePartner(
+                            saga_id=saga_id,
+                            id=payload.get('id'),
+                            id_marca=payload.get('id_marca'),
+                            id_partner=payload.get('id_partner'),
+                            tipo_partnership=payload.get('tipo_partnership', ''),
+                            terminos_contrato=payload.get('terminos_contrato', ''),
+                            comision_porcentaje=payload.get('comision_porcentaje', 0.0),
+                            metas_mensuales=payload.get('metas_mensuales', ''),
+                            beneficios_adicionales=payload.get('beneficios_adicionales', ''),
+                            notas=payload.get('notas', ''),
+                            fecha_creacion=payload.get('fecha_creacion', ''),
+                            fecha_actualizacion=payload.get('fecha_actualizacion', '')
+                        )
+                        ejecutar_commando(comando)
+                        logger.info(f"CommandCreatePartner lanzado por saga para id_partner: {payload.get('id_partner')}")
+                else:
+                    logger.warning("No Flask app context available for campaign event processing")
 
         except Exception as e:
             logger.error(f"Error procesando evento de campaña: {e}")
@@ -82,14 +88,20 @@ class EventConsumerService:
             if event_type == 'CommandCreatePartner' and status == 'failed':
                 from content_management.modulos.content_management.aplicacion.comandos.comandos_contenido import CommandContentRollbacked
                 from content_management.seedwork.aplicacion.comandos import ejecutar_commando
-                comando = CommandContentRollbacked(
-                    saga_id=saga_id,
-                    id=payload.get('id'),
-                    motivo=payload.get('motivo', 'Error en creación de partner'),
-                    fecha_rollback=''
-                )
-                ejecutar_commando(comando)
-                logger.info(f"CommandContentRollbacked lanzado por saga para id: {payload.get('id')}")
+                
+                # Ensure we're in a Flask app context when executing commands
+                if self.app:
+                    with self.app.app_context():
+                        comando = CommandContentRollbacked(
+                            saga_id=saga_id,
+                            id=payload.get('id'),
+                            motivo=payload.get('motivo', 'Error en creación de partner'),
+                            fecha_rollback=''
+                        )
+                        ejecutar_commando(comando)
+                        logger.info(f"CommandContentRollbacked lanzado por saga para id: {payload.get('id')}")
+                else:
+                    logger.warning("No Flask app context available for content event processing")
 
         except Exception as e:
             logger.error(f"Error procesando evento de contenido: {e}")
@@ -121,31 +133,6 @@ class EventConsumerService:
             logger.error(f"Topic name: {topic_name}")
             logger.error(f"Service URL: {self.config.service_url}")
     
-    def _handle_content_event(self, event_data: Dict[str, Any]):
-        """Maneja eventos de contenido delegando al event handler"""
-        try:
-            logger.info(f"Received content event: {event_data}")
-            
-            # Handle different event structures
-            event_type = event_data.get('event_type')
-            event_payload = event_data.get('event_data', event_data)  # Fallback to full event_data
-            
-            logger.info(f"Procesando evento de contenido: {event_type}")
-            logger.info(f"Event payload: {event_payload}")
-            
-            if self.event_handler:
-                # Ensure we're in a Flask app context when using the event handler
-                if self.app:
-                    with self.app.app_context():
-                        self.event_handler.handle_event(event_type, event_payload)
-                else:
-                    logger.warning("No Flask app context available for event handler")
-            else:
-                logger.warning("No event handler configured, skipping event processing")
-
-        except Exception as e:
-            logger.error(f"Error procesando evento de contenido: {e}")
-            logger.error(f"Event data: {event_data}")
 
 # Instancia global del servicio - será creada con Flask app context
 event_consumer_service = None
